@@ -108,7 +108,10 @@ class Twilio extends Messenger
     {
         // Initialize the API
         $meta = $this->getMessengerMeta();
-        $api = $this->getApi();
+
+        if (!($api = $this->getApi())) {
+            return null;
+        }
 
         Loader::loadModels($this, ['Staff', 'Clients', 'Contacts']);
 
@@ -136,16 +139,25 @@ class Twilio extends Messenger
             }
 
             // Send SMS
-            $response = $api->messages->create(
-                ($is_client ? $this->Html->ifSet($user->phone_number->number) : $this->Html->ifSet($user->number_mobile)),
-                [
-                    'from' => $meta->phone_number,
-                    'body' => $content
-                ]
-            );
+            try {
+                $response = $api->messages->create(
+                    (
+                        $is_client
+                            ? $this->Html->ifSet($user->phone_number->number)
+                            : $this->Html->ifSet($user->number_mobile)
+                    ),
+                    [
+                        'from' => $meta->phone_number,
+                        'body' => $content
+                    ]
+                );
 
-            $error = $response->errorMessage;
-            $success = empty($response->errorCode);
+                $error = $response->errorMessage;
+                $success = empty($response->errorCode);
+            } catch (\Twilio\Exceptions\TwilioException $e) {
+                $error = $e->getMessage();
+                $success = false;
+            }
         }
 
         $this->log($to_user_id, $content, $error, $success);
@@ -154,12 +166,18 @@ class Twilio extends Messenger
     /**
      * Gets an instance of the Twilio API.
      *
-     * @return \Twilio\Rest\Client An instance of Twilio API
+     * @return \Twilio\Rest\Client An instance of the Twilio API or null if the API can't be initialized
      */
     private function getApi()
     {
         $meta = $this->getMessengerMeta();
 
-        return new Client($meta->sid, $meta->token);
+        try {
+            return new Client($meta->sid, $meta->token);
+        } catch (\Twilio\Exceptions\ConfigurationException $e) {
+            $this->setMessage('error', $e->getMessage());
+
+            return null;
+        }
     }
 }
