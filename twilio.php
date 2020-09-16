@@ -138,6 +138,12 @@ class Twilio extends Messenger
                 $content = substr($content, 0, 918);
             }
 
+            $params = [
+                'from' => $meta->phone_number,
+                'body' => $content
+            ];
+            $this->log($to_user_id, json_encode($params, JSON_PRETTY_PRINT), 'input', true);
+
             // Send SMS
             try {
                 $response = $api->messages->create(
@@ -146,21 +152,19 @@ class Twilio extends Messenger
                             ? $this->Html->ifSet($user->phone_number->number)
                             : $this->Html->ifSet($user->number_mobile)
                     ),
-                    [
-                        'from' => $meta->phone_number,
-                        'body' => $content
-                    ]
+                    $params
                 );
 
-                $error = $response->errorMessage;
                 $success = empty($response->errorCode);
+
+                $this->log($to_user_id, json_encode($response, JSON_PRETTY_PRINT), 'output', $success);
             } catch (\Twilio\Exceptions\TwilioException $e) {
                 $error = $e->getMessage();
                 $success = false;
+
+                $this->log($to_user_id, json_encode($error, JSON_PRETTY_PRINT), 'output', $success);
             }
         }
-
-        $this->log($to_user_id, $content, $error, $success);
     }
 
     /**
