@@ -152,10 +152,7 @@ class Twilio extends Messenger
                             ? $this->Html->ifSet($user->phone_number->number)
                             : $this->Html->ifSet($user->number_mobile)
                     ),
-                    [
-                        'from' => $meta->phone_number,
-                        'body' => $content
-                    ]
+                    $params
                 );
 
                 $success = empty($response->errorCode);
