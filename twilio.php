@@ -45,7 +45,7 @@ class Twilio extends Messenger
         $sid = $fields->label(Language::_('Twilio.configuration_fields.phone_number', true), 'twilio_phone_number');
         $fields->setField(
             $sid->attach(
-                $fields->fieldText('phone_number', $this->Html->ifSet($vars['phone_number']), ['id' => 'twilio_phone_number'])
+                $fields->fieldText('phone_number', (isset($vars['phone_number']) ? $vars['phone_number'] : null), ['id' => 'twilio_phone_number'])
             )
         );
 
@@ -53,7 +53,7 @@ class Twilio extends Messenger
         $sid = $fields->label(Language::_('Twilio.configuration_fields.sid', true), 'twilio_sid');
         $fields->setField(
             $sid->attach(
-                $fields->fieldText('sid', $this->Html->ifSet($vars['sid']), ['id' => 'twilio_sid'])
+                $fields->fieldText('sid', (isset($vars['sid']) ? $vars['sid'] : null), ['id' => 'twilio_sid'])
             )
         );
 
@@ -61,7 +61,7 @@ class Twilio extends Messenger
         $token = $fields->label(Language::_('Twilio.configuration_fields.token', true), 'twilio_token');
         $fields->setField(
             $token->attach(
-                $fields->fieldText('token', $this->Html->ifSet($vars['token']), ['id' => 'twilio_token'])
+                $fields->fieldText('token', (isset($vars['token']) ? $vars['token'] : null), ['id' => 'twilio_token'])
             )
         );
 
@@ -149,8 +149,8 @@ class Twilio extends Messenger
                 $response = $api->messages->create(
                     (
                         $is_client
-                            ? $this->Html->ifSet($user->phone_number->number)
-                            : $this->Html->ifSet($user->number_mobile)
+                            ? (isset($user->phone_number->number) ? $user->phone_number->number : null)
+                            : (isset($user->number_mobile) ? $user->number_mobile : null)
                     ),
                     $params
                 );
