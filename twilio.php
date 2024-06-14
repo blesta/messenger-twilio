@@ -148,8 +148,8 @@ class Twilio extends Messenger
                 $response = $api->messages->create(
                     (
                         $is_client
-                            ? (isset($user->phone_number->number) ? $user->phone_number->number : '')
-                            : (isset($user->number_mobile) ? $user->number_mobile : '')
+                            ? (isset($user->phone_number->number) ? $user->phone_number->number : null)
+                            : (isset($user->number_mobile) ? $user->number_mobile : null)
                     ),
                     $params
                 );
