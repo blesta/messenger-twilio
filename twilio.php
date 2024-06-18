@@ -131,7 +131,6 @@ class Twilio extends Messenger
         // Send message
         $error = null;
         $success = false;
-
         if ($type == 'sms') {
             // SMS allows up to 918 characters, by concatenating 6 messages of 153 characters each
             if (strlen($content) > 918) {
@@ -149,8 +148,8 @@ class Twilio extends Messenger
                 $response = $api->messages->create(
                     (
                         $is_client
-                            ? (isset($user->phone_number->number) ? $user->phone_number->number : null)
-                            : (isset($user->number_mobile) ? $user->number_mobile : null)
+                            ? (isset($user->phone_number->number) ? $user->phone_number->number : '')
+                            : (isset($user->number_mobile) ? $user->number_mobile : '')
                     ),
                     $params
                 );
